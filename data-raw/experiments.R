@@ -7,13 +7,11 @@ pz = pz %>%
   pivot_longer(2:last_col(), names_to='Animal', values_to='Value') %>%
   mutate(Group = gsub('_\\d+', '', Animal), Animal=gsub('.*_', '', Animal)) %>%
   arrange()
-#
-# Y columns are Control and Treated
-# Sub columns are 1, 2, 3 for each (the animals)
 
-# pz2 <- list(
-#   id = data.frame(id = 1:3),
-#   y1 = data.frame(a = list(x1 = 1:3, x2 = 1:3), b = 1:3),
-#   y2 = matrix(1:6, ncol = 2)
-# )
-write_pzfx(pz, path = "~/junk/pz_alt.pzfx")
+write_pzfx(pz,
+           path = "~/junk/pz_alt2.pzfx",
+           x_var = "Minutes",
+           sub_var = "Animal",
+           grp_var = "Group",
+           val_var = "Value"
+  )
