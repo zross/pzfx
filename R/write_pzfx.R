@@ -22,68 +22,68 @@
 #' write_pzfx(df, path = tempfile(fileext = ".pzfx"), row_names = TRUE)
 write_pzfx <- function(x, path, row_names=TRUE, x_col=NA) {
   # figure out if x is a single table or multiple of them
-  if (inherits(x, c("data.frame", "matrix"))) {
-    x_lst <- list("Data 1"=x)
-  } else if (inherits(x, "list")) {
-    x_lst <- x
-    if (is.null(names(x_lst))) names(x_lst) <- paste("Data", seq_len(length(x_lst)))
-    are_dfs <- sapply(x_lst, function(x) inherits(x, c("data.frame", "matrix")))
-    if (any(!are_dfs)) stop(sprintf("These elements are not data frame or matrix: %s",
-                                    paste(names(x_lst)[!are_dfs], collapse=", ")))
-  } else {
-    stop(sprintf("Cannot process x of class %s", paste(class(x), collapse=", ")))
-  }
-  # make sure all elements are numeric
-  are_nums <- sapply(x_lst, function(x) all(sapply(x, is.numeric)))
-  if (any(!are_nums)) {
-    stop(paste0("These tables are not all numeric: ",
-                paste(names(x_lst)[!are_nums], collapse=", "),
-                ". Such tables are not supported by Prism GraphPad. ",
-                "You may want to spread / pivot the input data by non-numeric columns into a 'wide' format, ",
-                "where the table elements are all numeric."
-    ))
-  }
-  # make sure row_names matches the length of x_lst
-  if (length(row_names) == 1) row_names <- rep(row_names, length(x_lst))
-  if (length(row_names) != length(x_lst)) {
-    stop("Argument 'row_names' can only be of length 1 or the length of 'x'")
-  }
-  # convert other kinds of x_col specifications to a vector of integers
-  if (length(x_col) == 1) x_col <- rep(x_col, length(x_lst))
-  if (length(x_col) != length(x_lst)) {
-    stop("Argument 'x_col' can only be of length 1 or the length of 'x'")
-  }
-  x_col[is.na(x_col)] <- 0
-  if (is.numeric(x_col)) {
-    x_col <- as.integer(x_col)
-    if (any(x_col > sapply(x_lst, ncol))) {
-      vio <- which(x_col > sapply(x_lst, ncol))
-      stop(sprintf("Not enough columns for table %s", paste(names(x_lst)[vio], collapse=", ")))
-    }
-  }
-  if (is.character(x_col)) {
-    for (i in seq_len(length(x_col))) {
-      idx <- which(colnames(x_lst[[i]]) == x_col[i])
-      if (length(idx) == 0) {
-        warning(sprintf(
-          "Column %s is not in table %s, not used as 'X' column",
-          x_col[i], names(x_lst[[i]])))
-        x_col[i] <- 0
-      } else if (length(idx) > 1) {
-        warning(sprintf(
-          "Column %s has multiple occurance in table %s, only the first one used as 'X' column",
-          x_col[i], names(x_lst[[i]])))
-        x_col[i] <- idx[1]
-      } else {
-        x_col[i] <- idx
-      }
-    }
-    x_col <- as.integer(x_col)
-  }
+  # if (inherits(x, c("data.frame", "matrix"))) {
+  #   x_lst <- list("Data 1"=x)
+  # } else if (inherits(x, "list")) {
+  #   x_lst <- x
+  #   if (is.null(names(x_lst))) names(x_lst) <- paste("Data", seq_len(length(x_lst)))
+  #   are_dfs <- sapply(x_lst, function(x) inherits(x, c("data.frame", "matrix")))
+  #   if (any(!are_dfs)) stop(sprintf("These elements are not data frame or matrix: %s",
+  #                                   paste(names(x_lst)[!are_dfs], collapse=", ")))
+  # } else {
+  #   stop(sprintf("Cannot process x of class %s", paste(class(x), collapse=", ")))
+  # }
+  # # make sure all elements are numeric
+  # are_nums <- sapply(x_lst, function(x) all(sapply(x, is.numeric)))
+  # if (any(!are_nums)) {
+  #   stop(paste0("These tables are not all numeric: ",
+  #               paste(names(x_lst)[!are_nums], collapse=", "),
+  #               ". Such tables are not supported by Prism GraphPad. ",
+  #               "You may want to spread / pivot the input data by non-numeric columns into a 'wide' format, ",
+  #               "where the table elements are all numeric."
+  #   ))
+  # }
+  # # make sure row_names matches the length of x_lst
+  # if (length(row_names) == 1) row_names <- rep(row_names, length(x_lst))
+  # if (length(row_names) != length(x_lst)) {
+  #   stop("Argument 'row_names' can only be of length 1 or the length of 'x'")
+  # }
+  # # convert other kinds of x_col specifications to a vector of integers
+  # if (length(x_col) == 1) x_col <- rep(x_col, length(x_lst))
+  # if (length(x_col) != length(x_lst)) {
+  #   stop("Argument 'x_col' can only be of length 1 or the length of 'x'")
+  # }
+  # x_col[is.na(x_col)] <- 0
+  # if (is.numeric(x_col)) {
+  #   x_col <- as.integer(x_col)
+  #   if (any(x_col > sapply(x_lst, ncol))) {
+  #     vio <- which(x_col > sapply(x_lst, ncol))
+  #     stop(sprintf("Not enough columns for table %s", paste(names(x_lst)[vio], collapse=", ")))
+  #   }
+  # }
+  # if (is.character(x_col)) {
+  #   for (i in seq_len(length(x_col))) {
+  #     idx <- which(colnames(x_lst[[i]]) == x_col[i])
+  #     if (length(idx) == 0) {
+  #       warning(sprintf(
+  #         "Column %s is not in table %s, not used as 'X' column",
+  #         x_col[i], names(x_lst[[i]])))
+  #       x_col[i] <- 0
+  #     } else if (length(idx) > 1) {
+  #       warning(sprintf(
+  #         "Column %s has multiple occurance in table %s, only the first one used as 'X' column",
+  #         x_col[i], names(x_lst[[i]])))
+  #       x_col[i] <- idx[1]
+  #     } else {
+  #       x_col[i] <- idx
+  #     }
+  #   }
+  #   x_col <- as.integer(x_col)
+  # }
 
   lst <- base_lst()
-  lst$GraphPadPrismFile$TableSequence <- table_seq_lst(x_lst)
-  lst$GraphPadPrismFile <- append(lst$GraphPadPrismFile, table_lst(x_lst, row_names, x_col))
+  lst$GraphPadPrismFile$TableSequence <- table_seq_lst()
+  lst$GraphPadPrismFile <- append(lst$GraphPadPrismFile, table_lst(x))
   attr(lst$GraphPadPrismFile, "PrismXMLVersion") <- "5.00"
   xml <- xml2::as_xml_document(lst)
   xml2::write_xml(xml, path)
@@ -132,36 +132,43 @@ base_lst <- function() {
 
 # "TableSequence" element of the list for a pzfx xml
 # Number of Refs corresponds to number of tables
-table_seq_lst <- function(x_lst) {
-  ret <- lapply(seq_len(length(x_lst)), function(i) {
+table_seq_lst <- function() {
+  #ret <- lapply(seq_len(length(x_lst)), function(i) {
+
     ref <- structure(
       list(),
-      "ID"=sprintf("Table%d", i - 1)
+      "ID"="Table0"
     )
-    if (i == 1) attr(ref, "Selected") <- "1"
-    return(ref)
-  })
-  names(ret) <- rep("Ref", length(x_lst))
-  return(ret)
+    attr(ref, "Selected") <- "1"
+    #return(ref)
+  #})
+  list(
+    Ref = ref
+  )
+
+
 }
 
 # "Table" elements of the list for a pzfx xml
 # As many tables as you have
 # Currently only supports pzfx's "Column" type of tables
-table_lst <- function(x_lst, row_names, x_col) {
-  if (length(x_lst) != length(row_names)) {
-    stop("Argument 'row_names' can only be of the same length as 'x_lst'")
-  }
-  if (length(x_lst) != length(x_col)) {
-    stop("Argument 'x_col' can only be of the same length as 'x_lst'")
-  }
-  if (!is.integer(x_col)) {
-    stop("Argument 'x_col' can only be of type 'integer'")
-  }
-  subcol_helper <- function(v) {
-    v <- as.vector(v)
-    lapply(v, function(e) list("d"=list(as.character(e))))
-  }
+table_lst <- function(.data) {
+  browser()
+  # if (length(x_lst) != length(row_names)) {
+  #   stop("Argument 'row_names' can only be of the same length as 'x_lst'")
+  # }
+  # if (length(x_lst) != length(x_col)) {
+  #   stop("Argument 'x_col' can only be of the same length as 'x_lst'")
+  # }
+  # if (!is.integer(x_col)) {
+  #   stop("Argument 'x_col' can only be of type 'integer'")
+  # }
+  # subcol_helper <- function(v) {
+  #   v <- as.vector(v)
+  #   lapply(v, function(e) list("d"=list(as.character(e))))
+  # }
+
+
   ret <- lapply(seq_len(length(x_lst)), function(i) {
     this_df <- x_lst[[i]]
     cols <- lapply(seq_len(ncol(this_df)), function(c) {
