@@ -133,9 +133,10 @@ table_lst <- function(.data, x_var, sub_var, grp_var, val_var) {
 
     names(Subcolumns) <- rep("Subcolumn", length(Subcolumns))
 
+    #browser()
     structure(
       c(
-        list("Title" = grp),
+        list("Title" = list(grp)),
         Subcolumns
       ),
       Width = "89",
@@ -143,6 +144,7 @@ table_lst <- function(.data, x_var, sub_var, grp_var, val_var) {
       Subcolumns = as.character(length(sub_cols))
     )
   })
+
 
   names(YColumns) <- rep("YColumn", length(YColumns))
 
@@ -155,7 +157,7 @@ table_lst <- function(.data, x_var, sub_var, grp_var, val_var) {
       ID = "Table0",
       XFormat = "numbers",
       YFormat = "replicates",
-      Replicates = "3",
+      Replicates = as.character(length(unique(.data[[sub_var]]))),
       TableType = "XY",
       EVFormat = "AsteriskAfterNumber"
     )
